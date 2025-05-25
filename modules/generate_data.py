@@ -1,3 +1,5 @@
+# modules/generate_data.py
+
 """
 Skrip untuk menghasilkan dataset keuangan sintetis dengan variasi tipe pengguna.
 Dataset ini mencakup sumber pemasukan dan rincian pengeluaran,
@@ -25,7 +27,7 @@ USER_TYPES_CONFIG: Dict[str, np.ndarray] = {
     "normal": np.array([0.50, 0.30, 0.20]),
     "hemat": np.array([0.50, 0.20, 0.30]),
 }
-USER_TYPE_PROBS: List[float] = [0.3, 0.4, 0.3]
+USER_TYPE_PROBS: List[float] = [0.33, 0.34, 0.33]
 
 INCOME_SOURCE_ALPHA: np.ndarray = np.array([60, 10, 20, 10])
 MIN_INCOME = 2_000_000
@@ -317,10 +319,11 @@ def main() -> None:
     np.random.seed(RANDOM_SEED)
 
     logging.info("Menghasilkan tipe pengguna dan proporsi pengeluaran...")
-    chosen_user_types, spending_proportions = (
-        generate_user_types_and_spending_proportions(
-            N_SAMPLES, USER_TYPES_CONFIG, USER_TYPE_PROBS
-        )
+    (
+        chosen_user_types,
+        spending_proportions,
+    ) = generate_user_types_and_spending_proportions(
+        N_SAMPLES, USER_TYPES_CONFIG, USER_TYPE_PROBS
     )
 
     logging.info("Menghasilkan data pemasukan...")
