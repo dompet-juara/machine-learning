@@ -105,10 +105,8 @@ The project generates various visualizations, saved in the `image/` directory (c
 *   `training_akurasi_history.png`: Plot of training and validation accuracy over epochs.
 *   `training_loss_history.png`: Plot of training and validation loss over epochs.
 
-
-![Confusion Matrix](image/confusion_matrix.png "Confusion Matrix")
-![Training Accuracy](image/training_akurasi_history.png "Training Accuracy History")
-
+![Training Accuracy](image/distribusi_digit_bahan_pokok.png "Benford's Law analysis")
+![Confusion Matrix](image/target_distribution_countplot.png "Distribution of the target variable")
 
 ## 📂 Project Structure
 
@@ -263,7 +261,7 @@ After running the pipeline (`main.py` or `main.ipynb`), the model's performance 
 *   **Test Accuracy**: Approximately **94.25%**
 *   **Test Loss**: Approximately **0.1947**
 
-**Classification Report (Example from Notebook):**
+**Classification Report :**
 ```
               precision    recall  f1-score   support
 
@@ -275,8 +273,11 @@ After running the pipeline (`main.py` or `main.ipynb`), the model's performance 
    macro avg       0.94      0.94      0.94      3200
 weighted avg       0.94      0.94      0.94      3200
 ```
+**Confusion Matrix :**
+![Confusion Matrix](image/confusion_matrix.png "Confusion Matrix")
 
-Visualizations such as the confusion matrix (`image/confusion_matrix.png`), accuracy history (`image/training_akurasi_history.png`), and loss history (`image/training_loss_history.png`) provide further insights into the model's performance.
+**Training Accuracy History :**
+![Training Accuracy](image/training_akurasi_history.png "Training Accuracy History")
 
 TensorBoard logs are saved in `logs/fit/financial_classification` (path defined in `config.LOG_DIR_FIT`). You can visualize them by running:
 ```bash
