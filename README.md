@@ -139,7 +139,7 @@ dompet-juara-machine-learning/
 │   ├── training.py                 # Keras Tuner setup and model training logic
 │   └── utils.py                    # Utility functions (seeds, directories, plotting)
 ├── .gitignore
-├── LICENSE                         # lICENSE MIT
+├── LICENSE                         # License Project
 ├── main.ipynb                      # Jupyter Notebook for the full ML pipeline
 ├── main.py                         # Main Python script to run the full pipeline
 ├── README.md                       # This file
