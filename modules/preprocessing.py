@@ -10,9 +10,10 @@ yang dicakup meliputi:
    (Label Encoding dan One-Hot Encoding).
 2. Pembagian dataset menjadi set pelatihan dan set pengujian.
 3. Scaling fitur-fitur numerik menggunakan StandardScaler.
+4. Penyimpanan objek scaler dan label encoder ke file pickle.
 
 Fungsi utama `preprocess_data` mengorkestrasi semua langkah ini.
-Modul ini bergantung pada pandas, numpy, scikit-learn, dan TensorFlow,
+Modul ini bergantung pada pandas, numpy, scikit-learn, TensorFlow, pickle, os,
 serta modul lokal `config` untuk parameter konfigurasi.
 """
 
@@ -22,6 +23,8 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from typing import Tuple, List, Any, Optional
+import pickle
+import os
 
 from . import config
 
@@ -44,7 +47,7 @@ def encode_target_variable(
             - y_encoded (np.ndarray): Array NumPy dari target yang telah
               di-encode secara numerik (misalnya, 0, 1, 2, ...).
             - label_encoder (LabelEncoder): Objek LabelEncoder yang telah di-fit,
-              dapat digunakan untuk `inverse_transform`.
+              dapat digunakan untuk `inverse_transform` dan disimpan.
             - class_names (List[str]): Daftar nama kelas unik dalam urutan
               sesuai dengan encoding numeriknya.
             - num_classes (int): Jumlah total kelas unik.
@@ -113,10 +116,10 @@ def scale_numerical_features(
             - X_test_scaled (pd.DataFrame): DataFrame fitur pengujian yang
               telah di-scale.
             - scaler (StandardScaler): Objek StandardScaler yang telah di-fit,
-              dapat digunakan untuk mentransformasi data baru.
+              dapat digunakan untuk mentransformasi data baru dan disimpan.
     """
     print("\n--- Scaling Fitur Numerik (StandardScaler) ---")
-    numerical_cols = X_train.columns.tolist()
+    numerical_cols = X_train.columns.tolist()  # Asumsi semua kolom adalah numerik
     scaler = StandardScaler()
     X_train_scaled_np = scaler.fit_transform(X_train[numerical_cols])
     X_test_scaled_np = scaler.transform(X_test[numerical_cols])
@@ -153,10 +156,12 @@ def preprocess_data(
     Langkah-langkah yang dilakukan:
     1. Memisahkan fitur (X) dan target (y) dari DataFrame input.
     2. Melakukan Label Encoding pada variabel target.
-    3. Melakukan One-Hot Encoding pada variabel target yang sudah di-label-encode.
-    4. Membagi data menjadi set pelatihan dan pengujian (X_train, X_test, y_train, y_test).
+    3. Menyimpan objek LabelEncoder yang sudah di-fit ke file pickle.
+    4. Melakukan One-Hot Encoding pada variabel target yang sudah di-label-encode.
+    5. Membagi data menjadi set pelatihan dan pengujian (X_train, X_test, y_train, y_test).
        Pembagian dilakukan secara stratified untuk menjaga proporsi kelas.
-    5. Melakukan scaling pada fitur-fitur numerik (X_train, X_test) menggunakan StandardScaler.
+    6. Melakukan scaling pada fitur-fitur numerik (X_train, X_test) menggunakan StandardScaler.
+    7. Menyimpan objek StandardScaler yang sudah di-fit ke file pickle.
 
     Jika DataFrame input adalah None, fungsi akan mengembalikan tuple berisi None
     untuk semua output yang diharapkan.
@@ -187,6 +192,13 @@ def preprocess_data(
 
     print("\n" + "=" * 20 + " MEMULAI PRA-PEMROSESAN DATA " + "=" * 20)
 
+    try:
+        os.makedirs(config.TOOLS_DIR, exist_ok=True)
+        print(f"Direktori '{config.TOOLS_DIR}' siap digunakan.")
+    except Exception as e:
+        print(f"Gagal membuat direktori '{config.TOOLS_DIR}': {e}")
+        return (None,) * 9
+
     # 1. Pisahkan Fitur dan Target
     if config.TARGET_COLUMN not in df.columns:
         print(
@@ -200,9 +212,23 @@ def preprocess_data(
 
     # 2. Encoding Variabel Target
     y_encoded, label_encoder, class_names, num_classes = encode_target_variable(y)
+
+    # 3. Simpan LabelEncoder
+    if label_encoder:
+        try:
+            with open(config.LABEL_ENCODER_FILEPATH, "wb") as f:
+                pickle.dump(label_encoder, f)
+            print(
+                f"Label encoder berhasil disimpan ke: {config.LABEL_ENCODER_FILEPATH}"
+            )
+        except Exception as e:
+            print(f"Error saat menyimpan LabelEncoder: {e}")
+            return (None,) * 9
+
+    # 4. One-Hot Encoding Target
     y_one_hot = one_hot_encode_target(y_encoded, num_classes)
 
-    # 3. Pembagian Data menjadi Training dan Test Set
+    # 5. Pembagian Data menjadi Training dan Test Set
     print("\n--- Pembagian Data (Train-Test Split) ---")
     (
         X_train,
@@ -227,8 +253,18 @@ def preprocess_data(
         f"Shape y_train_labels_encoded: {y_train_labels_encoded.shape}, Shape y_test_labels_encoded: {y_test_labels_encoded.shape}"
     )
 
-    # 4. Scaling Fitur Numerik
+    # 6. Scaling Fitur Numerik
     X_train_scaled, X_test_scaled, scaler = scale_numerical_features(X_train, X_test)
+
+    # 7. Simpan StandardScaler
+    if scaler:
+        try:
+            with open(config.SCALER_FILEPATH, "wb") as f:
+                pickle.dump(scaler, f)
+            print(f"Scaler berhasil disimpan ke: {config.SCALER_FILEPATH}")
+        except Exception as e:
+            print(f"Error saat menyimpan Scaler: {e}")
+            return (None,) * 9
 
     print("\n" + "=" * 20 + " PRA-PEMROSESAN DATA SELESAI " + "=" * 20)
     return (

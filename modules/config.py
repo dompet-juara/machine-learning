@@ -43,6 +43,17 @@ TEST_SPLIT_SIZE = 0.2
 """float: Proporsi dataset yang akan dialokasikan untuk set pengujian (test set). 
 Nilai antara 0.0 dan 1.0."""
 
+TOOLS_DIR = "tools"
+"""str: Direktori untuk menyimpan alat bantu seperti scaler, encoder, dll."""
+
+SCALER_FILEPATH = os.path.join(TOOLS_DIR, "scaler.pkl")
+"""str: Path lengkap ke file scaler yang digunakan untuk normalisasi atau
+standarisasi fitur numerik dalam dataset."""
+
+LABEL_ENCODER_FILEPATH = os.path.join(TOOLS_DIR, "label_encoder.pkl")
+"""str: Path lengkap ke file LabelEncoder yang digunakan untuk mengubah
+label kategorikal menjadi format numerik."""
+
 # ==============================================================================
 # PENGATURAN DIREKTORI OUTPUT
 # ==============================================================================
