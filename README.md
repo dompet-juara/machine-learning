@@ -336,5 +336,6 @@ This project is licensed under the [**MIT License**](https://github.com/dompet-j
 
 *   **Project Team**: Dompet Juara
 *   **GitHub Organization**: [https://github.com/dompet-juara](https://github.com/dompet-juara)
+*   **Email**: juaradompet@gmail.com
 
 ---
